@@ -9,22 +9,19 @@ import numpy
 
 def sift_file_name(filename):
     filename = os.path.split(filename)[-1]
-    filename = ".".join(file_name.split('.')[0:-1]) + '.sift'
+    filename = ".".join(filename.split('.')[0:-1]) + '.sift'
     return os.path.join(filename)
 
 def process(filename, out_path):
     """Generates a descriptor image."""
-    img = cv2.imread(filename)
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    img = cv2.imread(filename, cv2.CV_LOAD_IMAGE_GRAYSCALE)
     img = cv2.equalizeHist(img)
     img = cv2.resize(img, (300, 250))
-    desc_file_name = sift_file_name(filename)
-    desc_file_name = os.path.join(out_path, desc_file_name)
     locations = list(itertools.product(range(0, 300, 5), range(0, 250, 5)))
     locations = [cv2.KeyPoint(x, y, 1) for (x, y) in locations]
     sift = cv2.DescriptorExtractor_create('SIFT')
     locations, desc = sift.compute(img, locations)
-    with open(desc_file_name, "wb") as f:
+    with open(out_path, "wb") as f:
         numpy.save(f, desc)
 
 
