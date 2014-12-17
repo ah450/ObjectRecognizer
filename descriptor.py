@@ -7,15 +7,19 @@ import itertools
 import random
 import numpy
 
-def process(filename):
+def sift_file_name(filename):
+    filename = os.path.split(filename)[-1]
+    filename = ".".join(file_name.split('.')[0:-1]) + '.sift'
+    return os.path.join(filename)
+
+def process(filename, out_path):
     """Generates a descriptor image."""
     img = cv2.imread(filename)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     img = cv2.equalizeHist(img)
     img = cv2.resize(img, (300, 250))
-    desc_file_name = os.path.split(filename)[-1]
-    desc_file_name = desc_file_name.split('.')[0] + '.sift'
-    desc_file_name = os.path.join(os.path.dirname(filename), desc_file_name)
+    desc_file_name = sift_file_name(filename)
+    desc_file_name = os.path.join(out_path, desc_file_name)
     locations = list(itertools.product(range(0, 300, 5), range(0, 250, 5)))
     locations = [cv2.KeyPoint(x, y, 1) for (x, y) in locations]
     sift = cv2.DescriptorExtractor_create('SIFT')
