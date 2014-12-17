@@ -3,6 +3,7 @@ Process a single image.
 """
 import cv2
 import os
+import glob
 import itertools
 import random
 import numpy
@@ -25,9 +26,9 @@ def process(filename, out_path):
         numpy.save(f, desc)
 
 
-def select_sample(path):
+def select_sample(path_glob):
     """returns a list of 75 random .sift file names"""
-    files = [os.path.join(path, x) for x in os.listdir(path) if ".sift" in x]
+    files = glob.glob(path_glob)
     # Use Reservoir sampling to choose 75 items at random from files
     result = []
     for i in range(0, 75):
