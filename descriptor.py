@@ -6,6 +6,7 @@ import os
 import itertools
 import random
 import numpy
+import itertools
 
 def process(filename):
     """Generates a descriptor image."""
@@ -36,5 +37,3 @@ def select_sample(path):
         if j <= 75:
             result[j] = files[i]
     return result
-
-    
