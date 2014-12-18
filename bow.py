@@ -7,7 +7,7 @@ import itertools
 import random
 import numpy
 import itertools
-import scipy.spatial as spatial
+
 
 def kmeans(images):
     """ takes a list of 75 randomly chosen descriptor file names, return  100 centroids matrix."""
@@ -23,21 +23,16 @@ def kmeans(images):
 
     return centers
 
-def bow(path, centers):
+def bow(path, tree):
     """ takes path of sift files, centroids calculated by kmeans, saves a bow file containing histogram for each sift file """
     files = [os.path.join(path, x) for x in os.listdir(path) if ".sift" in x]
 
     for file in files:
         image = numpy.load(file)
-        bow = numpy.zeros(len(centers)+1)
+        bow = numpy.zeros(101)
         for descriptor in image:
-            minVal = 1e17
-            minCenter = 0
-            for index, center in enumerate(centers):
-                sumOfSquaresOfDiff = spatial.distance.euclidean(center, descriptor)
-                if sumOfSquaresOfDiff < minVal:
-                    minVal, minCenter = sumOfSquaresOfDiff, index
-            bow[minCenter] += 1
+            cluster = tree.search_nn(descriptor)[0].data.cluster
+            bow[cluster] += 1
         bow_file_name = os.path.split(file)[-1]
         bow_file_name = bow_file_name.split('.')[0] + '.bow'
         bow_file_name = os.path.join(os.path.dirname(file), bow_file_name)
