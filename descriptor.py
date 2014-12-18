@@ -19,7 +19,7 @@ def process(filename, out_path):
     img = cv2.equalizeHist(img)
     img = cv2.resize(img, (300, 250))
     locations = list(itertools.product(range(0, 300, 5), range(0, 250, 5)))
-    locations = [cv2.KeyPoint(x, y, 1) for (x, y) in locations]
+    locations = [cv2.KeyPoint(x, y, 5) for (x, y) in locations]
     sift = cv2.DescriptorExtractor_create('SIFT')
     locations, desc = sift.compute(img, locations)
     with open(out_path, "wb") as f:
