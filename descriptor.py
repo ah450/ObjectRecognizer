@@ -6,7 +6,7 @@ import os
 import itertools
 import random
 import numpy
-import itertools
+
 
 def process(filename):
     """Generates a descriptor image."""
