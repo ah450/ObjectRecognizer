@@ -25,18 +25,15 @@ def process(filename, out_path):
     with open(out_path, "wb") as f:
         numpy.save(f, desc)
 
-
 def select_sample(path_glob):
     """returns a list of 75 random .sift file names"""
     files = glob.glob(path_glob)
     # Use Reservoir sampling to choose 75 items at random from files
-    result = []
+    result = [None] * 75
     for i in range(0, 75):
         result[i] = files[i]
-    for i in range(75+1, len(files)):
+    for i in range(75, len(files)):
         j = random.randint(0, i)
-        if j <= 75:
+        if j < 75:
             result[j] = files[i]
     return result
-
-    
