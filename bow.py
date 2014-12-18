@@ -7,6 +7,7 @@ import itertools
 import random
 import numpy
 import itertools
+import scipy.spatial as spatial
 
 def kmeans(images):
     """ takes a list of 75 randomly chosen descriptor file names, return  100 centroids matrix."""
@@ -16,9 +17,9 @@ def kmeans(images):
         descriptors = numpy.concatenate((descriptors, numpy.load(image)))
 
     num_images = len(images)
-    term_crit = (cv2.TERM_CRITERIA_EPS, 30, 0.1)
+    term_crit = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.1)
 
-    ret, labels, centers = cv2.kmeans(descriptors, 100, term_crit, 10, 0)
+    ret, labels, centers = cv2.kmeans(descriptors, 100, term_crit, 10, cv2.KMEANS_RANDOM_CENTERS)
 
     return centers
 
@@ -32,14 +33,10 @@ def bow(path, centers):
         for descriptor in image:
             minVal = 1e17
             minCenter = 0
-            centerI = 0
-            for center in centers:
-                sumOfSquaresOfDiff = 0
-                for a,b in itertools.izip(descriptor, center):
-                    sumOfSquaresOfDiff += (a-b) ** 2
+            for index, center in enumerate(centers):
+                sumOfSquaresOfDiff = spatial.distance.euclidean(center, descriptor)
                 if sumOfSquaresOfDiff < minVal:
-                    minVal, minCenter = sumOfSquaresOfDiff, centerI
-                centerI += 1
+                    minVal, minCenter = sumOfSquaresOfDiff, index
             bow[minCenter] += 1
         bow_file_name = os.path.split(file)[-1]
         bow_file_name = bow_file_name.split('.')[0] + '.bow'
