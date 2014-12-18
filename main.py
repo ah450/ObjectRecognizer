@@ -8,6 +8,8 @@ import descriptor
 import bow
 import bayes
 
+from multiprocessing import Pool
+
 if len(sys.argv) < 3:
     print "usage: ./main.py SamplesDir DataDir"
     exit(1)
@@ -80,6 +82,7 @@ for klass in os.listdir(sift_dir):
         os.makedirs(klass_bow_dir)
 
     print "Generating BoWs for %s/*" % klass
+    batch = []
     for sift_file in os.listdir(klass_sift_dir):
         bow_file = file_name_ext(sift_file, 'bow')
         bow_file = os.path.join(klass_bow_dir, bow_file)
@@ -88,11 +91,21 @@ for klass in os.listdir(sift_dir):
         if os.path.isfile(bow_file):
             print "Found " + bow_file
         else:
-            print "Generating " + bow_file
-            try:
-                bow.bow(vocab, sift_file, bow_file)
-            except:
-                "Failed for " + bow_file
+            batch.append((vocab, sift_file, bow_file))
+
+    def doit(b):
+        vocab, sift_file, bow_file = b
+        print "Generating " + bow_file
+        try:
+            bow.bow(vocab, sift_file, bow_file)
+        except:
+            "Failed for " + bow_file
+
+    p = Pool(4)
+    res = p.map_async(doit, batch, 10)
+    res.get()
+    p.close()
+    p.join()
 
 section("Training classifiers")
 classifiers = {}
@@ -140,6 +153,7 @@ for klass in class_test_files:
             tests += 1
             bow = np.empty((1, 101), np.float32)
             bow[0] = np.load(test_file)
+
             prediction = classifiers[klass].predict(bow)
             if np.abs(prediction[1] - actual) > 0.00001:
                 miss_classification += 1
