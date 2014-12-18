@@ -18,7 +18,7 @@ def kmeans(images):
         descriptors = numpy.concatenate((descriptors, numpy.load(image)))
 
     num_images = len(images)
-    term_crit = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.1)
+    term_crit = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 100, 0.00000001)
 
     ret, labels, centers = cv2.kmeans(descriptors, 100, term_crit, 10, cv2.KMEANS_RANDOM_CENTERS)
 
